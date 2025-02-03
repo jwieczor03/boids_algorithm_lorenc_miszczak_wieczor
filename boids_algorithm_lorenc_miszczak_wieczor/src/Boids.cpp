@@ -1,5 +1,5 @@
 #include <GL/glew.h>
-#include "Boids.h"
+#include "Headers/Boids.h"
 #include <cmath>
 #include <utility>
 #include <cstdlib>

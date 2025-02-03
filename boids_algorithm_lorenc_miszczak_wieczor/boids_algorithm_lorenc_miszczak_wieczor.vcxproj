@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -74,16 +74,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC;GLEW_STATIC</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GL\include;$(SolutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GL\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FREEGLUT\include;$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\STB</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GL\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2022</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glfw3.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GL\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\FREEGLUT\lib;$(SolutionDir)Dependencies\ASSIMP\lib\Debug;$(SolutionDir)Dependencies\STB</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glfw3.lib;freeglut.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -112,10 +112,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GL\include;$(SolutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GL\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2022</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glfw3.lib;glew32.lib;glew32mx.lib;glew32mxs.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -137,9 +140,46 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Boids.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Render_Utils.cpp" />
+    <ClCompile Include="src\Shader_Loader.cpp" />
+    <ClCompile Include="src\Terrain.cpp" />
+    <ClCompile Include="src\TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Boids.h" />
+    <ClInclude Include="src\Headers\Camera.h" />
+    <ClInclude Include="src\Headers\objload.h" />
+    <ClInclude Include="src\Headers\Texture.h" />
+    <ClInclude Include="src\hpp\Project.hpp" />
+    <ClInclude Include="src\Headers\Boids.h" />
+    <ClInclude Include="src\Headers\Render_Utils.h" />
+    <ClInclude Include="src\Headers\Shader_Loader.h" />
+    <ClInclude Include="src\hpp\Skybox.hpp" />
+    <ClInclude Include="src\hpp\Terrain.hpp" />
+    <ClInclude Include="src\hpp\TextureLoader.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shaders\shader.frag" />
+    <None Include="src\Shaders\shader.vert" />
+    <None Include="src\Shaders\skybox.frag" />
+    <None Include="src\Shaders\skybox.vert" />
+    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.mtlx" />
+    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.usdc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\Textures\Skybox\back.jpg" />
+    <Image Include="src\Textures\Skybox\bottom.jpg" />
+    <Image Include="src\Textures\Skybox\front.jpg" />
+    <Image Include="src\Textures\Skybox\left.jpg" />
+    <Image Include="src\Textures\Skybox\right.jpg" />
+    <Image Include="src\Textures\Skybox\top.jpg" />
+    <Image Include="src\Textures\Terrain\PavingStones138.png" />
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_AmbientOcclusion.png" />
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Color.png" />
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Displacement.png" />
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalDX.png" />
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalGL.png" />
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Roughness.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

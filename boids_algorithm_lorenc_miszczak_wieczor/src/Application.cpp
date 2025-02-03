@@ -1,55 +1,51 @@
-#include <GL/glew.h>
+#include "GL/glew.h"
+
 #include <GLFW/glfw3.h>
-#include "Boids.h"
+#include "glm.hpp"
+#include "ext.hpp"
+
 #include <iostream>
+#include <cmath>
+#include "hpp/Project.hpp"
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
 
-void initOpenGL() {
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-}
 
-int main() {
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
+int main(int argc, char** argv)
+{
+	// inicjalizacja glfw
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Boids Simulation", nullptr, nullptr);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
-    glfwMakeContextCurrent(window);
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW" << std::endl;
-        return -1;
-    }
+	// tworzenie okna za pomoca glfw
+	GLFWwindow* window = glfwCreateWindow(800, 600, "FirstWindow", NULL, NULL);
+	if (window == NULL)
+	{
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
 
-    initOpenGL();
+	//ruszanie kamer¹
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
-    BoidSystem boidSystem(100);
+	// ladowanie OpenGL za pomoca glewa
+	glewInit();
+	glViewport(0, 0, 800, 600);
 
-    while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT);
+	init(window);
 
-        boidSystem.update();
-        boidSystem.draw();
+	// uruchomienie glownej petli
+	renderLoop(window);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 0;
+	shutdown(window);
+	glfwTerminate();
+	return 0;
 }

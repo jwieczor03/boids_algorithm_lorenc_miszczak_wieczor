@@ -21,10 +21,101 @@
     <ClCompile Include="src\Boids.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Shader_Loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Render_Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Boids.h">
+    <ClInclude Include="src\Headers\Boids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Headers\Shader_Loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Headers\Render_Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hpp\Project.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Headers\objload.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Headers\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hpp\Terrain.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hpp\TextureLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hpp\Skybox.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Headers\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\shader.vert" />
+    <None Include="src\shaders\shader.frag" />
+    <None Include="src\Shaders\skybox.vert" />
+    <None Include="src\Shaders\skybox.frag" />
+    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.mtlx" />
+    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.usdc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\Textures\Skybox\bottom.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Skybox\back.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Skybox\front.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Skybox\left.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Skybox\right.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Skybox\top.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\PavingStones138.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_AmbientOcclusion.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Color.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Displacement.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalDX.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalGL.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Roughness.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

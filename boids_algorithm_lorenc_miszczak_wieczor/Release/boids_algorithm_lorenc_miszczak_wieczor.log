@@ -1,0 +1,47 @@
+﻿  Application.cpp
+C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Application.cpp(4,10): error C1083: Nie można otworzyć pliku dołącz: 'glm.hpp': No such file or directory
+  Boids.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103): warning C4244: "argument": konwersja z "_Ty" do "float", możliwa utrata danych
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103): warning C4244:             _Ty=int
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103): warning C4244:         ]
+  (kompilowanie pliku źródłowego „src/Boids.cpp”)
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xmemory(700,103):
+      kontekst tworzenia wystąpienia szablonu (najpierw najstarszy) to
+          C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Boids.cpp(175,15):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „Boid &std::vector<Boid,std::allocator<Boid>>::emplace_back<int,int,float,float,int&>(int &&,int &&,float &&,float &&,int &)” funkcji szablon
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(858,24):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<int,int,float,float,int&>(int &&,int &&,float &&,float &&,int &)” funkcji szablon
+          with
+          [
+              _Ty=Boid
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(776,20):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<int,int,float,float,int&>(int &&,int &&,float &&,float &&,int &)” funkcji szablon
+          with
+          [
+              _Ty=Boid
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vector(794,27):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „void std::_Default_allocator_traits<_Alloc>::construct<_Ty,int,int,float,float,int&>(_Alloc &,_Objty *const ,int &&,int &&,float &&,float &&,int &)” funkcji szablon
+          with
+          [
+              _Alloc=std::allocator<Boid>,
+              _Ty=Boid,
+              _Objty=Boid
+          ]
+  
+  Box.cpp
+  Camera.cpp
+C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Headers\Camera.h(3,10): error C1083: Nie można otworzyć pliku dołącz: 'glm.hpp': No such file or directory
+  (kompilowanie pliku źródłowego „src/Camera.cpp”)
+  
+  Render_Utils.cpp
+C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Headers\Render_Utils.h(2,10): error C1083: Nie można otworzyć pliku dołącz: 'glm.hpp': No such file or directory
+  (kompilowanie pliku źródłowego „src/Render_Utils.cpp”)
+  
+  Shader_Loader.cpp
+C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Headers\Shader_Loader.h(4,10): error C1083: Nie można otworzyć pliku dołącz: 'freeglut.h': No such file or directory
+  (kompilowanie pliku źródłowego „src/Shader_Loader.cpp”)
+  
