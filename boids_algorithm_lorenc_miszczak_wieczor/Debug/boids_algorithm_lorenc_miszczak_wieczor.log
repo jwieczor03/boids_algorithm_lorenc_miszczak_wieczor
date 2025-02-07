@@ -1,5 +1,5 @@
 ﻿  Terrain.cpp
-C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(53,32): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(55,36): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(179,40): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(75,32): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(77,36): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(222,40): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
   boids_algorithm_lorenc_miszczak_wieczor.vcxproj -> C:\Users\Ksawery\Desktop\GrafikaProjekt\Debug\boids_algorithm_lorenc_miszczak_wieczor.exe

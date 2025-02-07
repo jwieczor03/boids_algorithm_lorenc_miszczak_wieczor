@@ -41,9 +41,9 @@ GLuint loadTexture(const char* path) {
     glGenTextures(1, &textureID);
 
     int width, height, nrChannels;
-    printf("Texture1\n");
+
     unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
-    printf("Texture2\n");
+
 
     if (data) {
         GLenum format;
@@ -53,11 +53,10 @@ GLuint loadTexture(const char* path) {
             format = GL_RGB;
         else if (nrChannels == 4)
             format = GL_RGBA;
-        printf("Texture3\n");
+
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        printf("Texture4\n");
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

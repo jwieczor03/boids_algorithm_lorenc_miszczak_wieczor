@@ -10,10 +10,12 @@ namespace Terrain {
     GLuint grassColor, grassAO, grassRoughness, grassNormal, grassDisplacement;
     GLuint rockColor, rockAO, rockRoughness, rockNormal, rockDisplacement;
     GLuint snowColor, snowAO, snowRoughness, snowNormal, snowDisplacement;
+    bool lightingEnabled = true; // Domyœlnie œwiat³o w³¹czone
+
 
 
     void initTerrain() {
-        // Wczytaj heightmapê
+        // Wczytaj heightmap?
         stbi_set_flip_vertically_on_load(true);
         GLint width, height, nrChannels;
         unsigned char* data = stbi_load("src/Textures/Terrain/Heightmaps/iceland_heightmap.png", &width, &height, &nrChannels, 0);
@@ -49,6 +51,26 @@ namespace Terrain {
         std::cout << "Loaded " << vertices.size() / 3 << " vertices" << std::endl;
         stbi_image_free(data);
 
+        std::vector<float> normals(vertices.size(), 0.0f); // Wektor normalnych, na pocz¹tek zerowy
+
+        // Iteracja po ka¿dym wierzcho³ku i obliczanie normalnych
+        for (int i = 1; i < height - 1; i++) {
+            for (int j = 1; j < width - 1; j++) {
+                int index = (j + width * i);
+                glm::vec3 left(vertices[(index - 1) * 3], vertices[(index - 1) * 3 + 1], vertices[(index - 1) * 3 + 2]);
+                glm::vec3 right(vertices[(index + 1) * 3], vertices[(index + 1) * 3 + 1], vertices[(index + 1) * 3 + 2]);
+                glm::vec3 up(vertices[(index - width) * 3], vertices[(index - width) * 3 + 1], vertices[(index - width) * 3 + 2]);
+                glm::vec3 down(vertices[(index + width) * 3], vertices[(index + width) * 3 + 1], vertices[(index + width) * 3 + 2]);
+
+                glm::vec3 normal = glm::normalize(glm::cross(right - left, down - up));
+
+                normals[index * 3] = normal.x;
+                normals[index * 3 + 1] = normal.y;
+                normals[index * 3 + 2] = normal.z;
+            }
+        }
+
+
         std::vector<unsigned> indices;
         for (unsigned i = 0; i < height - 1; i += rez)
         {
@@ -73,11 +95,18 @@ namespace Terrain {
 
         glGenBuffers(1, &terrainVBO);
         glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + normals.size() * sizeof(float), nullptr, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), normals.size() * sizeof(float), &normals[0]);
 
-        // position attribute
+        // Atrybuty wierzcho³ków
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
+
+        // Atrybuty normalnych
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(vertices.size() * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
 
         glGenBuffers(1, &terrainIBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainIBO);
@@ -92,7 +121,7 @@ namespace Terrain {
         rockColor = loadTexture("src/Textures/Terrain/Rock/Rock020_1K-PNG_Color.png");
         rockAO = loadTexture("src/Textures/Terrain/Rock/Rock020_1K-PNG_AmbientOcclusion.png");
         rockRoughness = loadTexture("src/Textures/Terrain/Rock/Rock020_1K-PNG_Roughness.png");
-        rockNormal = loadTexture("src/Textures/Terrain/Rock/Rock020_1K=PNG_NormalGL.png");
+        rockNormal = loadTexture("src/Textures/Terrain/Rock/Rock020_1K-PNG_NormalGL.png");
         rockDisplacement = loadTexture("src/Textures/Terrain/Rock/Rock020_1K-PNG_Displacement.png");
 
         snowColor = loadTexture("src/Textures/Terrain/Snow/Snow008A_1K-PNG_Color.png");
@@ -102,13 +131,27 @@ namespace Terrain {
         snowDisplacement = loadTexture("src/Textures/Terrain/Snow/Snow008A_1K-PNG_Displacement.png");
     }
 
-    void drawTerrain(GLuint program, const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& color) {
+    void drawTerrain(GLuint program, const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& color, const glm::vec3& cameraPos, bool lightingEnabled) {
 
         glUseProgram(program);
         glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, &projMatrix[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &viewMatrix[0][0]);
         glm::mat4 model = glm::mat4(1.0f);
         glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &model[0][0]);
+
+
+        glUniform1i(glGetUniformLocation(program, "lightingEnabled"), lightingEnabled);
+        glm::vec3 lightPos(50.0f, 100.0f, 50.0f);
+        glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, &lightPos[0]);
+
+
+        // Pozycja kamery
+        glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
+
+        // Kolor œwiat³a
+        glm::vec3 lightColor(0.98, 0.9, 0.823);
+        glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, &lightColor[0]);
+
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, grassColor);
@@ -171,9 +214,9 @@ namespace Terrain {
         glActiveTexture(GL_TEXTURE14);
         glBindTexture(GL_TEXTURE_2D, snowDisplacement);
         glUniform1i(glGetUniformLocation(program, "snowDisplacement"), 14);
-        
-        
-        
+
+
+
         glBindVertexArray(terrainVAO);
         //        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         for (unsigned strip = 0; strip < numStrips; strip++)
@@ -183,7 +226,7 @@ namespace Terrain {
                 numTrisPerStrip + 2,   // number of indices to render
                 GL_UNSIGNED_INT,     // index data type
                 (void*)(sizeof(unsigned) * (numTrisPerStrip + 2) * strip)); // offset to starting index
- 
+
 
 
         } glUseProgram(0);
@@ -197,8 +240,8 @@ namespace Terrain {
     }
 }
 
-    // Funkcje drawTerrain i shutdownTerrain pozostaj¹ bez zmian
-    // ...
+// Funkcje drawTerrain i shutdownTerrain pozostaj? bez zmian
+// ...
 
 
 

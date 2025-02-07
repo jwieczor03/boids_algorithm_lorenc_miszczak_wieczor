@@ -1,5 +1,4 @@
-﻿
-#include "GL/glew.h"
+﻿#include "GL/glew.h"
 #include <GLFW/glfw3.h>
 #include "glm.hpp"
 #include "ext.hpp"
@@ -16,6 +15,8 @@
 
 namespace fs = std::filesystem;
 Core::Shader_Loader shaderLoader;
+bool lightingEnabled = true; 
+
 
 // Parametry kamery
 glm::vec3 cameraPos = glm::vec3(8.2f, 9.8f, -10.0f);  //Pozycja kamery
@@ -74,6 +75,10 @@ void processInput(GLFWwindow* window) {
         cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        lightingEnabled = !lightingEnabled; // Przełącz stan
+        std::cout << "Lighting: " << (lightingEnabled ? "ON" : "OFF") << std::endl;
+    }
 }
 
 // Callback obs³ugi ruchu myszy – aktualizacja kierunku patrzenia kamery
@@ -145,6 +150,8 @@ void renderScene(GLFWwindow* window) {
     glm::mat4 viewProjection = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 view = createCameraMatrix();
     glm::mat4 projection = createPerspectiveMatrix();
+    glm::vec3 lightColor(1.0f, 1.0f, 1.0f);   // Białe światło
+    glm::vec3 lightPos(10.0f, 20.0f, 10.0f);
 
 
     glDepthFunc(GL_LEQUAL);
@@ -153,7 +160,7 @@ void renderScene(GLFWwindow* window) {
 
     glDepthFunc(GL_LESS);//Domyślne ustawienia głębi
 
-    Terrain::drawTerrain(program, view, projection, glm::vec3(0.75f));
+    Terrain::drawTerrain(program, view, projection, glm::vec3(0.75f), cameraPos,lightingEnabled);
 
 
 
@@ -163,7 +170,7 @@ void renderScene(GLFWwindow* window) {
 void renderLoop(GLFWwindow* window) {
 
     while (!glfwWindowShouldClose(window)) {
-        printf("Camerapos: %f, %f, %f\n", cameraPos.x, cameraPos.y, cameraPos.z);
+        //printf("Camerapos: %f, %f, %f\n", cameraPos.x, cameraPos.y, cameraPos.z);
         processInput(window);
         renderScene(window);
         glfwPollEvents();
