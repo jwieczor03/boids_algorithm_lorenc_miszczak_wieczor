@@ -143,6 +143,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Render_Utils.cpp" />
     <ClCompile Include="src\Shader_Loader.cpp" />
+    <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\TextureLoader.cpp" />
   </ItemGroup>
@@ -163,8 +164,8 @@
     <None Include="src\Shaders\shader.vert" />
     <None Include="src\Shaders\skybox.frag" />
     <None Include="src\Shaders\skybox.vert" />
-    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.mtlx" />
-    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.usdc" />
+    <None Include="src\Textures\Terrain\PavningStone\PavingStones138_1K-PNG.mtlx" />
+    <None Include="src\Textures\Terrain\PavningStone\PavingStones138_1K-PNG.usdc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\Textures\Skybox\back.jpg" />
@@ -173,13 +174,34 @@
     <Image Include="src\Textures\Skybox\left.jpg" />
     <Image Include="src\Textures\Skybox\right.jpg" />
     <Image Include="src\Textures\Skybox\top.jpg" />
-    <Image Include="src\Textures\Terrain\PavingStones138.png" />
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_AmbientOcclusion.png" />
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Color.png" />
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Displacement.png" />
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalDX.png" />
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalGL.png" />
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Roughness.png" />
+    <Image Include="src\Textures\Terrain\Grass\Grass001.png" />
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_AmbientOcclusion.png" />
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_Color.png" />
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_Displacement.png" />
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_NormalDX.png" />
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_NormalGL.png" />
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_Roughness.png" />
+    <Image Include="src\Textures\Terrain\Heightmaps\heightmap.png" />
+    <Image Include="src\Textures\Terrain\Heightmaps\iceland_heightmap.png" />
+    <Image Include="src\Textures\Terrain\PavningStone\ps.png" />
+    <Image Include="src\Textures\Terrain\PavningStone\ps_AmbientOcclusion.png" />
+    <Image Include="src\Textures\Terrain\PavningStone\ps_Color.png" />
+    <Image Include="src\Textures\Terrain\PavningStone\ps_Displacement.png" />
+    <Image Include="src\Textures\Terrain\PavningStone\ps_NormalDX.png" />
+    <Image Include="src\Textures\Terrain\PavningStone\ps_NormalGL.png" />
+    <Image Include="src\Textures\Terrain\PavningStone\ps_Roughness.png" />
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_AmbientOcclusion.png" />
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_Color.png" />
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_Displacement.png" />
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_NormalDX.png" />
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_NormalGL.png" />
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_Roughness.png" />
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_AmbientOcclusion.png" />
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_Color.png" />
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_Displacement.png" />
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_NormalDX.png" />
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_NormalGL.png" />
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_Roughness.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

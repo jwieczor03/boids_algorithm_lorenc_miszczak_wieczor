@@ -36,6 +36,9 @@
     <ClCompile Include="src\TextureLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Headers\Boids.h">
@@ -70,12 +73,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\shader.vert" />
-    <None Include="src\shaders\shader.frag" />
     <None Include="src\Shaders\skybox.vert" />
     <None Include="src\Shaders\skybox.frag" />
-    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.mtlx" />
-    <None Include="src\Textures\Terrain\PavingStones138_1K-PNG.usdc" />
+    <None Include="src\Textures\Terrain\PavningStone\PavingStones138_1K-PNG.mtlx" />
+    <None Include="src\Textures\Terrain\PavningStone\PavingStones138_1K-PNG.usdc" />
+    <None Include="src\Shaders\shader.vert" />
+    <None Include="src\Shaders\shader.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\Textures\Skybox\bottom.jpg">
@@ -96,25 +99,88 @@
     <Image Include="src\Textures\Skybox\top.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\Textures\Terrain\PavingStones138.png">
+    <Image Include="src\Textures\Terrain\PavningStone\ps.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_AmbientOcclusion.png">
+    <Image Include="src\Textures\Terrain\PavningStone\ps_AmbientOcclusion.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Color.png">
+    <Image Include="src\Textures\Terrain\PavningStone\ps_Color.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Displacement.png">
+    <Image Include="src\Textures\Terrain\PavningStone\ps_Displacement.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalDX.png">
+    <Image Include="src\Textures\Terrain\PavningStone\ps_NormalDX.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_NormalGL.png">
+    <Image Include="src\Textures\Terrain\PavningStone\ps_NormalGL.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\Textures\Terrain\PavingStones138_1K-PNG_Roughness.png">
+    <Image Include="src\Textures\Terrain\PavningStone\ps_Roughness.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Heightmaps\iceland_heightmap.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Heightmaps\heightmap.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Grass\Grass001.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_AmbientOcclusion.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_Color.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_Displacement.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_NormalDX.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_NormalGL.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Grass\Grass001_1K-PNG_Roughness.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_AmbientOcclusion.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_Color.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_Displacement.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_NormalDX.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_NormalGL.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Rock\Rock020_1K-PNG_Roughness.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_AmbientOcclusion.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_Color.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_Displacement.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_NormalDX.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_NormalGL.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\Textures\Terrain\Snow\Snow008A_1K-PNG_Roughness.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

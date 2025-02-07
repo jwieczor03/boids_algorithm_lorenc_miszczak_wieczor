@@ -7,6 +7,6 @@ uniform mat4 view;
 void main() {
 
     TexCoords = aPos;
-    mat4 viewWithoutTranslation = mat4(mat3(view)); // Usuñ translacjê
+    mat4 viewWithoutTranslation = mat4(mat3(view));
     gl_Position = projection * viewWithoutTranslation * vec4(aPos, 1.0);
 }

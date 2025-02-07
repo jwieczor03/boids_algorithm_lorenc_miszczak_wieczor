@@ -35,36 +35,40 @@ GLuint loadCubemap(const std::vector<std::string>& faces) {
 
     return textureID;
 }
-//GLuint loadTextures(const std::unordered_map<std::string, std::string>& textureFiles,
-//    std::unordered_map<std::string, GLuint>& textureIDs) {
-//    int width, height, nrChannels;
-//
-//    for (const auto& [name, path] : textureFiles) {
-//        GLuint textureID;
-//        glGenTextures(1, &textureID);
-//        glBindTexture(GL_TEXTURE_2D, textureID);
-//
-//        unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-//        if (data) {
-//            GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-//            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-//            glGenerateMipmap(GL_TEXTURE_2D);
-//
-//            // Ustawienia filtrowania i wrapowania
-//            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//
-//            stbi_image_free(data);
-//            textureIDs[name] = textureID;
-//        }
-//        else {
-//            fprintf(stderr, "Failed to load cubemap texture: %s\n", path.c_str());
-//            stbi_image_free(data);
-//            return 0;  // Zwracamy 0 w przypadku b³êdu
-//        }
-//    }
-//
-//    return 1;  // Sukces
-//}
+
+GLuint loadTexture(const char* path) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrChannels;
+    printf("Texture1\n");
+    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
+    printf("Texture2\n");
+
+    if (data) {
+        GLenum format;
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+        printf("Texture3\n");
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        printf("Texture4\n");
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    else {
+        fprintf(stderr, "Failed to load texture: %s\n", path);
+        return 0;
+    }
+    stbi_image_free(data);
+    return textureID;
+}
+
