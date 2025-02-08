@@ -1,4 +1,4 @@
-#include "GL/glew.h"
+﻿#include "GL/glew.h"
 
 #include <GLFW/glfw3.h>
 #include "glm.hpp"
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 	}
 	glfwMakeContextCurrent(window);
 
-	//ruszanie kamer�
+	//ruszanie kamer¹
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 

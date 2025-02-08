@@ -1,5 +1,4 @@
-﻿
-#include <GLFW/glfw3.h>
+﻿#include <GLFW/glfw3.h>
 #include "glm.hpp"
 #include "ext.hpp"
 #include <iostream>
@@ -12,6 +11,13 @@
 #include "TextureLoader.hpp"
 #include "Skybox.hpp"
 #include "ShadowMap.hpp"
+#include "Headers/Boids.h"  // Dodaj odpowiedni include
+#include <cstdlib>  // Dla rand()
+#include <ctime> 
+BoidSystem* boidSystem = nullptr;
+GLuint boidsShader;
+
+
 
 namespace fs = std::filesystem;
 Core::Shader_Loader shaderLoader;
@@ -43,6 +49,8 @@ GLuint cubemapTexture;
 GLuint skyboxShader;
 GLuint shadowFBO, shadowMap;
 GLuint shadowShader;
+GLuint qVAO, qVBO;
+GLuint shadowDebugShader;
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 
 
@@ -50,6 +58,7 @@ const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 // Ustawienia rzutowania
 float aspectRatio = 1.f;
 const float fov = glm::radians(90.0f);
+
 
 // Funkcja tworz¹ca macierz widoku na podstawie pozycji i kierunku kamery
 glm::mat4 createCameraMatrix() {
@@ -79,7 +88,7 @@ std::tuple<glm::mat4, glm::mat4, glm::mat4> createLightSpaceMatrix() {
         300.0f
     );
 
-    glm::vec3 lightPos = glm::vec3(-9.0f, 200.0f, 10.0f);
+    glm::vec3 lightPos = glm::vec3(-100.0f, 200.0f, 10.0f);
     glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f));
 
     glm::mat4 lightView = glm::lookAt(
@@ -155,6 +164,35 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     cameraFront = glm::normalize(front);
 }
 
+void setupDebugQuad()
+{
+    float quadVertices[] = {
+        // Pozycje    // TexCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+    };
+
+    glGenVertexArrays(1, &qVAO);
+    glGenBuffers(1, &qVBO);
+    glBindVertexArray(qVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, qVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+
 // Zwalnianie zasobów (shaderów, terenu)
 void shutdown(GLFWwindow* window) {
 
@@ -164,6 +202,8 @@ void shutdown(GLFWwindow* window) {
     glDeleteBuffers(1, &skyboxVBO);
     glDeleteTextures(1, &cubemapTexture);
     shaderLoader.DeleteProgram(skyboxShader);
+    delete boidSystem;
+    glDeleteProgram(boidsShader);
 }
 
 void renderShadowMap() {
@@ -195,6 +235,9 @@ void renderSceneWithShadows() {
     glm::mat4 view = createCameraMatrix();
     glm::mat4 projection = createPerspectiveMatrix();
 
+    glUniformMatrix4fv(glGetUniformLocation(boidsShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(boidsShader, "view"), 1, GL_FALSE, &view[0][0]);
+
     glm::mat4 lightSpaceMatrix, lightView, lightProjection;
 
     std::tie(lightSpaceMatrix, lightView, lightProjection) = createLightSpaceMatrix();
@@ -225,21 +268,52 @@ void renderSkybox() {
 void init(GLFWwindow* window) {
 
     glEnable(GL_DEPTH_TEST);
+    //shadowDebugShader = shaderL
+    // oader.CreateProgram("src/Shaders/shadow_debug.vert", "src/Shaders/shadow_debug.frag");
+
+    boidSystem = new BoidSystem(300, 3);
     program = shaderLoader.CreateProgram("src/Shaders/shader.vert", "src/Shaders/shader.frag");
     skyboxShader = shaderLoader.CreateProgram("src/Shaders/skybox.vert", "src/Shaders/skybox.frag");
+    boidsShader = shaderLoader.CreateProgram("src/Shaders/boids.vert", "src/Shaders/boids.frag");
     InitShadowMap(shadowFBO, shadowMap, SHADOW_WIDTH, SHADOW_HEIGHT);
     shadowShader = shaderLoader.CreateProgram("src/Shaders/shadow.vert", "src/Shaders/shadow.frag");
     Skybox::initSkybox();
     Terrain::initTerrain();
-
+    setupDebugQuad();
 
 }
 
+
+void renderShadowMapDebug()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(shadowDebugShader); // Użyj shaderów debugujących
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, shadowMap);
+    glUniform1i(glGetUniformLocation(shadowDebugShader, "shadowMap"), 0);
+
+    glBindVertexArray(qVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+}
+
+
 // Funkcja rysująca scenę (teren)
 void renderScene(GLFWwindow* window) {
-    renderShadowMap();         // 1. Renderowanie shadow mapy
+
+    renderShadowMap();
+    //renderShadowMapDebug(); // 1. Renderowanie shadow mapy
     renderSceneWithShadows();    // 2. Renderowanie sceny z cieniami
     renderSkybox();              // 3. Renderowanie skyboxa
+    boidSystem->update();
+
+    glUseProgram(boidsShader);
+    glm::mat4 view = createCameraMatrix();
+    glm::mat4 projection = createPerspectiveMatrix();
+    boidSystem->draw(view, projection, boidsShader);
+
+
 }
 
 
