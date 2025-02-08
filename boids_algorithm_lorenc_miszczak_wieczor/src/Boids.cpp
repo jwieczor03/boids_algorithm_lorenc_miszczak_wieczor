@@ -1,186 +1,284 @@
-#include <GL/glew.h>
-#include "Headers/Boids.h"
+#include "Boids.h"
 #include <cmath>
-#include <utility>
-#include <cstdlib>
+#include <GL/glew.h>
+#include <vector>
 #include <iostream>
+#include <algorithm> 
 
-Boid::Boid(float x, float y, float vx, float vy, int group)
-    : x(x), y(y), vx(vx), vy(vy), group(group) {
-    // Assign colors based on group
-    switch (group) {
-    case 0: r = 1.0f; g = 0.0f; b = 0.0f; break; // Red
-    case 1: r = 0.0f; g = 1.0f; b = 0.0f; break; // Green
-    case 2: r = 0.0f; g = 0.0f; b = 1.0f; break; // Blue
-    default: r = 1.0f; g = 1.0f; b = 1.0f; break; // White
-    }
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
+Vec3::Vec3() : x(0), y(0), z(0) {}
+Vec3::Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+Vec3 Vec3::operator+(const Vec3& other) const {
+    return Vec3(x + other.x, y + other.y, z + other.z);
 }
 
-void Boid::update(const std::vector<Boid>& boids) {
-    std::pair<float, float> alignment = align(boids);
-    std::pair<float, float> cohesionForce = cohesion(boids);
-    std::pair<float, float> separationForce = separation(boids);
-    std::pair<float, float> interGroupSeparationForce = interGroupSeparation(boids);
+Vec3& Vec3::operator+=(const Vec3& other) {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+}
 
-    vx += alignment.first + cohesionForce.first + separationForce.first + interGroupSeparationForce.first;
-    vy += alignment.second + cohesionForce.second + separationForce.second + interGroupSeparationForce.second;
+Vec3 Vec3::operator-(const Vec3& other) const {
+    return Vec3(x - other.x, y - other.y, z - other.z);
+}
 
-    // Limit the speed of the boids
-    float speed = std::sqrt(vx * vx + vy * vy);
-    float maxSpeed = 1.0f; // Reduced max speed to make boids move slower
-    float minSpeed = 0.5f; // Minimum speed to prevent boids from stopping
-    if (speed > maxSpeed) {
-        vx = (vx / speed) * maxSpeed;
-        vy = (vy / speed) * maxSpeed;
+Vec3 Vec3::operator*(float scalar) const {
+    return Vec3(x * scalar, y * scalar, z * scalar);
+}
+
+Vec3& Vec3::operator*=(float scalar) {
+    x *= scalar;
+    y *= scalar;
+    z *= scalar;
+    return *this;
+}
+
+float Vec3::length() const {
+    return std::sqrt(x * x + y * y + z * z);
+}
+
+Vec3 Vec3::normalized() const {
+    float len = length();
+    if (len > 0) {
+        return *this * (1.0f / len);
     }
-    else if (speed < minSpeed) {
-        vx = (vx / speed) * minSpeed;
-        vy = (vy / speed) * minSpeed;
-    }
+    return Vec3(0, 0, 0);
+}
 
-    x += vx;
-    y += vy;
+Color::Color(float r, float g, float b) : r(r), g(g), b(b) {}
 
-    // Keep boids within window bounds
-    if (x < 0) x += 800;
-    if (x > 800) x -= 800;
-    if (y < 0) y += 600;
-    if (y > 600) y -= 600;
+bool Color::operator==(const Color& other) const {
+    return r == other.r && g == other.g && b == other.b;
+}
+
+bool Color::operator!=(const Color& other) const {
+    return !(*this == other);
+}
+
+Boid::Boid(Vec3 position, Vec3 velocity, int group, Color color)
+    : position(position), velocity(velocity), group(group), color(color) {
+}
+
+void Boid::updatePosition(const Vec3& newPos) {
+    position = newPos;
+}
+
+Vec3 Boid::getPosition() const {
+    return position;
+}
+
+Vec3 Boid::getVelocity() const {
+    return velocity;
+}
+
+void Boid::setVelocity(const Vec3& velocity) {
+    this->velocity = velocity;
+}
+
+void Boid::setPosition(Vec3 position) {
+    this->position = position;
+}
+
+Color Boid::getColor() const {
+    return color;
 }
 
 void Boid::draw() const {
-    glColor3f(r, g, b);
+    glColor3f(color.r, color.g, color.b);
+    drawBoid();
+}
+
+void Boid::drawBoid() const {
+    glPushMatrix();
+    glTranslatef(position.x, position.y, position.z);
     glBegin(GL_TRIANGLES);
-    glVertex2f(x, y);
-    glVertex2f(x + 5.0f, y + 10.0f);
-    glVertex2f(x - 5.0f, y + 10.0f);
+    glVertex3f(0.0f, 0.1f, 0.0f);  // Front point
+    glVertex3f(-0.05f, -0.05f, 0.05f); // Left
+    glVertex3f(0.05f, -0.05f, 0.05f);  // Right
+
+    glVertex3f(0.0f, 0.1f, 0.0f);  // Front point
+    glVertex3f(0.05f, -0.05f, 0.05f); // Right
+    glVertex3f(0.05f, -0.05f, -0.05f); // Bottom
+
+    glVertex3f(0.0f, 0.1f, 0.0f);  // Front point
+    glVertex3f(0.05f, -0.05f, -0.05f); // Right
+    glVertex3f(-0.05f, -0.05f, -0.05f); // Left
+
+    glVertex3f(0.0f, 0.1f, 0.0f);  // Front point
+    glVertex3f(-0.05f, -0.05f, -0.05f); // Left
+    glVertex3f(-0.05f, -0.05f, 0.05f);  // Left
     glEnd();
+    glPopMatrix();
 }
 
-std::pair<float, float> Boid::align(const std::vector<Boid>& boids) {
-    float neighborDist = 50.0f;
-    float avgVx = 0.0f;
-    float avgVy = 0.0f;
-    int count = 0;
-
-    for (const Boid& other : boids) {
-        if (other.group != group) continue; // Only align with boids of the same group
-        float d = std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
-        if ((d > 0) && (d < neighborDist)) {
-            avgVx += other.vx;
-            avgVy += other.vy;
-            count++;
-        }
-    }
-
-    if (count > 0) {
-        avgVx /= count;
-        avgVy /= count;
-
-        // Steer towards the average velocity
-        avgVx = (avgVx - vx) * 0.05f;
-        avgVy = (avgVy - vy) * 0.05f;
-    }
-
-    return { avgVx, avgVy };
-}
-
-std::pair<float, float> Boid::cohesion(const std::vector<Boid>& boids) {
-    float neighborDist = 50.0f;
-    float avgX = 0.0f;
-    float avgY = 0.0f;
-    int count = 0;
-
-    for (const Boid& other : boids) {
-        if (other.group != group) continue; // Only cohere with boids of the same group
-        float d = std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
-        if ((d > 0) && (d < neighborDist)) {
-            avgX += other.x;
-            avgY += other.y;
-            count++;
-        }
-    }
-
-    if (count > 0) {
-        avgX /= count;
-        avgY /= count;
-
-        // Steer towards the average position
-        avgX = (avgX - x) * 0.01f;
-        avgY = (avgY - y) * 0.01f;
-    }
-
-    return { avgX, avgY };
-}
-
-std::pair<float, float> Boid::separation(const std::vector<Boid>& boids) {
-    float desiredSeparation = 25.0f;
-    float steerX = 0.0f;
-    float steerY = 0.0f;
-    int count = 0;
-
-    for (const Boid& other : boids) {
-        if (other.group != group) continue; // Only separate from boids of the same group
-        float d = std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
-        if ((d > 0) && (d < desiredSeparation)) {
-            float diffX = x - other.x;
-            float diffY = y - other.y;
-            diffX /= d;
-            diffY /= d;
-            steerX += diffX;
-            steerY += diffY;
-            count++;
-        }
-    }
-
-    if (count > 0) {
-        steerX /= count;
-        steerY /= count;
-    }
-
-    return { steerX, steerY };
-}
-
-std::pair<float, float> Boid::interGroupSeparation(const std::vector<Boid>& boids) {
-    float desiredSeparation = 50.0f; // Larger separation distance for inter-group separation
-    float steerX = 0.0f;
-    float steerY = 0.0f;
-    int count = 0;
-
-    for (const Boid& other : boids) {
-        if (other.group == group) continue; // Only separate from boids of different groups
-        float d = std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
-        if ((d > 0) && (d < desiredSeparation)) {
-            float diffX = x - other.x;
-            float diffY = y - other.y;
-            diffX /= d;
-            diffY /= d;
-            steerX += diffX;
-            steerY += diffY;
-            count++;
-        }
-    }
-
-    if (count > 0) {
-        steerX /= count;
-        steerY /= count;
-    }
-
-    return { steerX, steerY };
-}
-
-BoidSystem::BoidSystem(int numBoids) {
+BoidSystem::BoidSystem(int numBoids, int numGroups) {
     for (int i = 0; i < numBoids; ++i) {
-        int group = i % 3; // Assign groups in a round-robin fashion
-        boids.emplace_back(rand() % 800, rand() % 600, (rand() % 100 - 50) / 200.0f, (rand() % 100 - 50) / 200.0f, group); // Reduced initial speed
+        int group = i % numGroups;
+        Color color;
+        if (group == 0) {
+            color = Color(1.0f, 0.0f, 0.0f); // Red
+        }
+        else if (group == 1) {
+            color = Color(0.0f, 1.0f, 0.0f); // Green
+        }
+        else {
+            color = Color(0.0f, 0.0f, 1.0f); // Blue
+        }
+        boids.emplace_back(Vec3(rand() % 10 - 5, rand() % 10 - 5, rand() % 20 - 20), Vec3(0.1f, 0.1f, 0.0f), group, color);
     }
 }
+
+
+
+Vec3 BoidSystem::separation(const Boid& boid, bool sameGroup) {
+    Vec3 steering(0, 0, 0);
+    int total = 0;
+    for (const Boid& other : boids) {
+        if (&boid != &other) {
+            float distance = (boid.getPosition() - other.getPosition()).length();
+            if (distance < SEPARATION_RADIUS) {
+                Vec3 diff = boid.getPosition() - other.getPosition();
+                diff = diff.normalized();
+                steering += diff;
+                total++;
+            }
+        }
+    }
+    if (total > 0) {
+        steering *= (1.0f / total);
+    }
+    return steering;
+}
+
+Vec3 BoidSystem::alignment(const Boid& boid, bool sameGroup) {
+    Vec3 steering(0, 0, 0);
+    int total = 0;
+    for (const Boid& other : boids) {
+        if (&boid != &other && (sameGroup ? boid.getColor() == other.getColor() : true)) {
+            steering += other.getVelocity();
+            total++;
+        }
+    }
+    if (total > 0) {
+        steering *= (1.0f / total);
+        steering = steering.normalized();
+    }
+    return steering;
+}
+
+Vec3 BoidSystem::cohesion(const Boid& boid, bool sameGroup) {
+    Vec3 steering(0, 0, 0);
+    int total = 0;
+    for (const Boid& other : boids) {
+        if (&boid != &other && (sameGroup ? boid.getColor() == other.getColor() : true)) {
+            steering += other.getPosition();
+            total++;
+        }
+    }
+    if (total > 0) {
+        steering *= (1.0f / total);
+        steering = steering - boid.getPosition();
+        steering = steering.normalized();
+    }
+    return steering;
+}
+
+Vec3 BoidSystem::groupAvoidance(const Boid& boid) {
+    Vec3 steering(0, 0, 0);
+    for (const Boid& other : boids) {
+        if (&boid != &other && boid.getColor() != other.getColor()) {
+            float distance = (boid.getPosition() - other.getPosition()).length();
+            if (distance < GROUP_AVOID_RADIUS) {
+                Vec3 diff = boid.getPosition() - other.getPosition();
+                diff = diff.normalized();
+                steering += diff;
+            }
+        }
+    }
+    return steering;
+}
+
+Vec3 BoidSystem::limit(const Vec3& v, float max) {
+    if (v.length() > max) {
+        return v.normalized() * max;
+    }
+    return v;
+}
+void BoidSystem::keepWithinBounds(Boid& boid) {
+    Vec3 position = boid.getPosition();
+    Vec3 velocity = boid.getVelocity();
+
+    // Window boundaries
+    float halfWidth = WINDOW_WIDTH / 2.0f;
+    float halfHeight = WINDOW_HEIGHT / 2.0f;
+
+    // Reflect off the boundaries in the X axis
+    if (position.x < -halfWidth) {
+        position.x = -halfWidth;
+        velocity.x = std::abs(velocity.x); // Reflect off the left edge
+    }
+    else if (position.x > halfWidth) {
+        position.x = halfWidth;
+        velocity.x = -std::abs(velocity.x); // Reflect off the right edge
+    }
+
+    // Reflect off the boundaries in the Y axis
+    if (position.y < -halfHeight) {
+        position.y = -halfHeight;
+        velocity.y = std::abs(velocity.y); // Reflect off the bottom edge
+    }
+    else if (position.y > halfHeight) {
+        position.y = halfHeight;
+        velocity.y = -std::abs(velocity.y); // Reflect off the top edge
+    }
+
+    // Reflect off the boundaries in the Z axis (in 3D)
+    if (position.z < -halfHeight) {
+        position.z = -halfHeight;
+        velocity.z = std::abs(velocity.z); // Reflect off the back edge
+    }
+    else if (position.z > halfHeight) {
+        position.z = halfHeight;
+        velocity.z = -std::abs(velocity.z); // Reflect off the front edge
+    }
+
+    // Ensure the boid does not exceed the boundaries due to high speed
+    boid.updatePosition(position);
+    boid.setVelocity(velocity);
+}
+
+
+
+
+
 
 void BoidSystem::update() {
     for (Boid& boid : boids) {
-        boid.update(boids);
+        // Calculate the steering forces
+        Vec3 sep = separation(boid, true);
+        Vec3 ali = alignment(boid, true);
+        Vec3 coh = cohesion(boid, true);
+
+        // Calculate new velocity
+        Vec3 newVelocity = boid.getVelocity() + sep + ali + coh;
+
+        // Limit the velocity to a maximum value
+        newVelocity = limit(newVelocity, MAX_SPEED);
+
+        // Update the boid's velocity and position
+        boid.setVelocity(newVelocity);
+        boid.updatePosition(boid.getPosition() + boid.getVelocity());
+
+        // Ensure the boid stays within the window boundaries
+        keepWithinBounds(boid);
     }
 }
+
+
 
 void BoidSystem::draw() const {
     for (const Boid& boid : boids) {
