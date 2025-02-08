@@ -1,4 +1,4 @@
-#include "Boids.h"
+#include "Headers/Boids.h"
 #include <cmath>
 #include <GL/glew.h>
 #include <vector>
