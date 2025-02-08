@@ -39,6 +39,9 @@
     <ClCompile Include="src\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ShadowMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Headers\Boids.h">
@@ -71,6 +74,9 @@
     <ClInclude Include="src\Headers\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\hpp\ShadowMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\skybox.vert" />
@@ -79,6 +85,8 @@
     <None Include="src\Textures\Terrain\PavningStone\PavingStones138_1K-PNG.usdc" />
     <None Include="src\Shaders\shader.vert" />
     <None Include="src\Shaders\shader.frag" />
+    <None Include="src\Shaders\shadow.vert" />
+    <None Include="src\Shaders\shadow.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\Textures\Skybox\bottom.jpg">
