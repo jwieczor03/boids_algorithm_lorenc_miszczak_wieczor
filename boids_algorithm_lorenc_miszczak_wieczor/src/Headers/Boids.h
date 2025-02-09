@@ -4,6 +4,7 @@
 #include <glm.hpp>
 #include <vector>
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 class Boid {
 public:
@@ -30,15 +31,17 @@ private:
 class BoidSystem {
 public:
     BoidSystem(int numBoids, int numGroups);
-    void update();
+    void handleInput(GLFWwindow* window);
+    void update(GLFWwindow* window);
     void draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const;
+    float getMaxSpeed() const;
 
 private:
     std::vector<Boid> boids;
-    const float SEPARATION_RADIUS = 1.0f;
-    const float ALIGNMENT_RADIUS = 3.0f;
-    const float COHESION_RADIUS = 3.0f;
-    const float MAX_SPEED = 1.0f;
+    float SEPARATION_RADIUS = 1.0f;
+    float ALIGNMENT_RADIUS = 3.0f;
+    float COHESION_RADIUS = 3.0f;
+    float MAX_SPEED = 1.0f;
     const float BOUNDARY = 50.0f;
 
     glm::vec3 separation(const Boid& boid) const;

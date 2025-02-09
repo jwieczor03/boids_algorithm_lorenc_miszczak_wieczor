@@ -306,7 +306,7 @@ void renderScene(GLFWwindow* window) {
     //renderShadowMapDebug(); // 1. Renderowanie shadow mapy
     renderSceneWithShadows();    // 2. Renderowanie sceny z cieniami
     renderSkybox();              // 3. Renderowanie skyboxa
-    boidSystem->update();
+    boidSystem->update(window);
 
     glUseProgram(boidsShader);
     glm::mat4 view = createCameraMatrix();
@@ -324,6 +324,7 @@ void renderLoop(GLFWwindow* window) {
         printf("Camerapos: %f, %f, %f, CameraDir: %f, %f, %f\n", cameraPos.x, cameraPos.y, cameraPos.z, cameraFront.x, cameraFront.y, cameraFront.z);
         processInput(window);
         renderScene(window);
+        printf("Max Speed: %f\n", boidSystem->getMaxSpeed());
         glfwPollEvents();
         glfwSwapBuffers(window);
     }

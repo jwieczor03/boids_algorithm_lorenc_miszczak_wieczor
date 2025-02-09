@@ -148,7 +148,24 @@ BoidSystem::BoidSystem(int numBoids, int numGroups) {
     }
 }
 
-void BoidSystem::update() {
+void BoidSystem::handleInput(GLFWwindow* window) {
+    float speedChange = 0.1f; // Adjust this value to change the speed increment
+
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        MAX_SPEED += speedChange; // Zwiększanie MAX_SPEED
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        MAX_SPEED = std::max(0.0f, MAX_SPEED - speedChange); // Zmniejszanie MAX_SPEED, ale nie poniżej 0
+    }
+}
+
+float BoidSystem::getMaxSpeed() const {
+    return MAX_SPEED;
+}
+
+void BoidSystem::update(GLFWwindow* window) {
+    handleInput(window);
+
     for (auto& boid : boids) {
         glm::vec3 sep = separation(boid);
         glm::vec3 ali = alignment(boid);
