@@ -4,6 +4,8 @@
 #include <GL/glew.h>
 #include <gtc/matrix_transform.hpp>
 #include <ctime>
+#include <unordered_map>
+
 
 // Statyczne zmienne klasy Boid
 GLuint Boid::VAO = 0;
@@ -163,30 +165,49 @@ void BoidSystem::draw(const glm::mat4& view, const glm::mat4& projection, GLuint
 }
 
 bool BoidSystem::checkCollision(const Boid& a, const Boid& b) const {
-    if (a.getColor() != b.getColor()) return false; // Tylko boidy tej samej grupy się odpychają
+    if (a.getColor() != b.getColor()) return false; // Only boids of the same group repel each other
 
-    float size = 0.5f; // Zmienna zależna od rozmiaru boida
+    float size = 0.5f; // Variable dependent on boid size
     glm::vec3 posA = a.getPosition();
     glm::vec3 posB = b.getPosition();
 
-    // Zmienna do wykrywania kolizji oparta na odległości
+    // Collision detection based on distance
     return glm::distance(posA, posB) < size;
 }
 
 void BoidSystem::resolveCollisions() {
-    for (size_t i = 0; i < boids.size(); ++i) {
-        for (size_t j = i + 1; j < boids.size(); ++j) {
-            if (checkCollision(boids[i], boids[j])) {
-                glm::vec3 velA = boids[i].getVelocity();
-                glm::vec3 velB = boids[j].getVelocity();
+    const float cellSize = 1.0f; // Adjust based on boid size and density
+    std::unordered_map<int, std::vector<Boid*>> grid;
 
-                // Zmiana prędkości tylko w obrębie tej samej grupy
-                boids[i].setVelocity(-velA);
-                boids[j].setVelocity(-velB);
+    auto getCellIndex = [cellSize](const glm::vec3& pos) {
+        int x = static_cast<int>(pos.x / cellSize);
+        int y = static_cast<int>(pos.y / cellSize);
+        int z = static_cast<int>(pos.z / cellSize);
+        return (x * 73856093) ^ (y * 19349663) ^ (z * 83492791); // Hash function for 3D grid
+        };
+
+    for (auto& boid : boids) {
+        int cellIndex = getCellIndex(boid.getPosition());
+        grid[cellIndex].push_back(&boid);
+    }
+
+    for (auto& cell : grid) {
+        auto& cellBoids = cell.second;
+        for (size_t i = 0; i < cellBoids.size(); ++i) {
+            for (size_t j = i + 1; j < cellBoids.size(); ++j) {
+                if (checkCollision(*cellBoids[i], *cellBoids[j])) {
+                    glm::vec3 velA = cellBoids[i]->getVelocity();
+                    glm::vec3 velB = cellBoids[j]->getVelocity();
+
+                    // Change velocity only within the same group
+                    cellBoids[i]->setVelocity(-velA);
+                    cellBoids[j]->setVelocity(-velB);
+                }
             }
         }
     }
 }
+
 
 
 glm::vec3 BoidSystem::separation(const Boid& boid) const {
@@ -194,7 +215,7 @@ glm::vec3 BoidSystem::separation(const Boid& boid) const {
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other && boid.getColor() == other.getColor()) { // Sprawdzamy, czy są tej samej grupy
+        if (&boid != &other && boid.getColor() == other.getColor()) { // Check if they are in the same group
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < SEPARATION_RADIUS) {
                 glm::vec3 diff = boid.getPosition() - other.getPosition();
@@ -210,6 +231,7 @@ glm::vec3 BoidSystem::separation(const Boid& boid) const {
     }
     return steering;
 }
+
 
 glm::vec3 BoidSystem::alignment(const Boid& boid) const {
     glm::vec3 avgVelocity(0.0f);
