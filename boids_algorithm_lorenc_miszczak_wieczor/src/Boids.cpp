@@ -234,10 +234,19 @@ void BoidSystem::keepWithinBounds(Boid& boid) {
     glm::vec3 vel = boid.getVelocity();
 
     const float margin = 2.0f;
+    const float groundLevel = 9.0f;  // Poziom ziemi (ustaw na wyższą wartość, jeśli boidy mają latać wyżej)
+
+    // Ograniczenie dla osi X i Z (obecne)
     if (pos.x < -BOUNDARY + margin) vel.x = margin * 0.1f;
     if (pos.x > BOUNDARY - margin) vel.x = -margin * 0.1f;
     if (pos.z < -BOUNDARY + margin) vel.z = margin * 0.1f;
     if (pos.z > BOUNDARY - margin) vel.z = -margin * 0.1f;
+
+    // Ograniczenie dla osi Y (zapobiega wlatywaniu w ziemię)
+    if (pos.y < groundLevel) {
+        pos.y = groundLevel;  // Jeśli boid jest poniżej ziemi, ustaw jego pozycję na poziomie ziemi
+        vel.y = 0.0f;         // Zatrzymanie ruchu w osi Y, gdy boid osiągnie ziemię
+    }
 
     pos.x = glm::clamp(pos.x, -BOUNDARY, BOUNDARY);
     pos.z = glm::clamp(pos.z, -BOUNDARY, BOUNDARY);
@@ -245,6 +254,8 @@ void BoidSystem::keepWithinBounds(Boid& boid) {
     boid.setVelocity(vel);
     boid.updatePosition(pos);
 }
+
+
 
 glm::vec3 BoidSystem::limit(glm::vec3 vec, float max) const {
     float length = glm::length(vec);
