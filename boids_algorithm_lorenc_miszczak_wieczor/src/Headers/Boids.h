@@ -23,7 +23,7 @@ private:
     glm::vec3 color;
 
     static GLuint VAO, VBO;
-    static const float BOID_VERTICES[36];
+    static const float BOID_VERTICES[63];
     static void initializeGeometry();
 };
 

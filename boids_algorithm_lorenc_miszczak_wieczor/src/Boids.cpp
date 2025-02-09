@@ -10,25 +10,41 @@ GLuint Boid::VAO = 0;
 GLuint Boid::VBO = 0;
 
 const float Boid::BOID_VERTICES[] = {
-    // Front triangle
-    0.0f, 0.5f, 0.0f,
-    -0.5f, -0.5f, 0.5f,
-    0.5f, -0.5f, 0.5f,
+ // Dziób (przedni trójkąt)
+    // Przedni trójkąt (dziób)
+     0.0f,  0.5f,  1.0f,  // Wierzchołek (dziób)
+    -0.5f, -0.5f,  0.0f,  // Lewy dół
+     0.5f, -0.5f,  0.0f,  // Prawy dół
 
-    // Right triangle
-    0.0f, 0.5f, 0.0f,
-    0.5f, -0.5f, 0.5f,
-    0.5f, -0.5f, -0.5f,
+    // Tylny trójkąt
+     0.0f,  0.5f, -1.0f,  
+    -0.5f, -0.5f,  0.0f,  
+     0.5f, -0.5f,  0.0f,  
 
-    // Left triangle
-    0.0f, 0.5f, 0.0f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, 0.5f,
+    // Lewa ściana
+     0.0f,  0.5f,  1.0f,  
+    -0.5f, -0.5f,  0.0f,  
+     0.0f,  0.5f, -1.0f,  
 
-    // Back triangle
-    0.0f, 0.5f, 0.0f,
-    0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f
+    // Prawa ściana
+     0.0f,  0.5f,  1.0f,  
+     0.5f, -0.5f,  0.0f,  
+     0.0f,  0.5f, -1.0f,  
+
+    // Spód
+    -0.5f, -0.5f,  0.0f,  
+     0.5f, -0.5f,  0.0f,  
+     0.0f, -0.5f, -1.0f,  
+
+    // Skrzydło lewe
+    -0.5f, -0.5f,  0.0f,  
+    -1.0f,  0.0f, -0.5f,  
+     0.0f, -0.5f, -0.5f,  
+
+    // Skrzydło prawe
+     0.5f, -0.5f,  0.0f,  
+     1.0f,  0.0f, -0.5f,  
+     0.0f, -0.5f, -0.5f  
 };
 
 void Boid::initializeGeometry() {
@@ -40,6 +56,7 @@ void Boid::initializeGeometry() {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(BOID_VERTICES), BOID_VERTICES, GL_STATIC_DRAW);
 
+        // Atrybut pozycji (layout = 0 w shaderze)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
@@ -47,6 +64,8 @@ void Boid::initializeGeometry() {
         glBindVertexArray(0);
     }
 }
+
+
 
 Boid::Boid(glm::vec3 position, glm::vec3 velocity, int group, glm::vec3 color)
     : position(position), velocity(velocity), group(group), color(color) {
@@ -71,8 +90,13 @@ void Boid::draw(const glm::mat4& view, const glm::mat4& projection, GLuint shade
 
     if (glm::length(velocity) > 0.001f) {
         glm::vec3 dir = glm::normalize(velocity);
-        float angle = atan2(dir.x, dir.z);
-        model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+
+        // Kierunek lotu -> Euler angles
+        float yaw = atan2(dir.x, dir.z);
+        float pitch = -asin(dir.y);
+
+        model = glm::rotate(model, yaw, glm::vec3(0.0f, 1.0f, 0.0f));   // Obrót w poziomie
+        model = glm::rotate(model, pitch, glm::vec3(1.0f, 0.0f, 0.0f)); // Obrót w pionie
     }
 
     glUseProgram(shader);
@@ -82,9 +106,11 @@ void Boid::draw(const glm::mat4& view, const glm::mat4& projection, GLuint shade
     glUniform3fv(glGetUniformLocation(shader, "color"), 1, &color[0]);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 12);
+    glDrawArrays(GL_TRIANGLES, 0, 21);  // 21 wierzchołków = pełny model ptaka
     glBindVertexArray(0);
 }
+
+
 
 BoidSystem::BoidSystem(int numBoids, int numGroups) {
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -234,7 +260,7 @@ void BoidSystem::keepWithinBounds(Boid& boid) {
     glm::vec3 vel = boid.getVelocity();
 
     const float margin = 2.0f;
-    const float groundLevel = 9.0f;  // Minimalna wysokość (poziom ziemi)
+    const float groundLevel = 10.0f;  // Minimalna wysokość (poziom ziemi)
     const float maxHeight = 40.0f;   // Maksymalna wysokość lotu
 
     // Ograniczenie dla osi X i Z (obecne)
