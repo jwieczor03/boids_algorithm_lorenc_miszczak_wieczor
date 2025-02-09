@@ -137,11 +137,14 @@ void BoidSystem::draw(const glm::mat4& view, const glm::mat4& projection, GLuint
 }
 
 bool BoidSystem::checkCollision(const Boid& a, const Boid& b) const {
-    float size = 0.5f; // Rozmiar AABB
+    if (a.getColor() != b.getColor()) return false; // Tylko boidy tej samej grupy się odpychają
+
+    float size = 0.5f; // Zmienna zależna od rozmiaru boida
     glm::vec3 posA = a.getPosition();
     glm::vec3 posB = b.getPosition();
 
-    return glm::all(glm::lessThan(glm::abs(posA - posB), glm::vec3(size)));
+    // Zmienna do wykrywania kolizji oparta na odległości
+    return glm::distance(posA, posB) < size;
 }
 
 void BoidSystem::resolveCollisions() {
@@ -151,6 +154,7 @@ void BoidSystem::resolveCollisions() {
                 glm::vec3 velA = boids[i].getVelocity();
                 glm::vec3 velB = boids[j].getVelocity();
 
+                // Zmiana prędkości tylko w obrębie tej samej grupy
                 boids[i].setVelocity(-velA);
                 boids[j].setVelocity(-velB);
             }
@@ -158,12 +162,13 @@ void BoidSystem::resolveCollisions() {
     }
 }
 
+
 glm::vec3 BoidSystem::separation(const Boid& boid) const {
     glm::vec3 steering(0.0f);
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other && boid.getColor() == other.getColor()) {
+        if (&boid != &other && boid.getColor() == other.getColor()) { // Sprawdzamy, czy są tej samej grupy
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < SEPARATION_RADIUS) {
                 glm::vec3 diff = boid.getPosition() - other.getPosition();
@@ -185,7 +190,7 @@ glm::vec3 BoidSystem::alignment(const Boid& boid) const {
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other && boid.getColor() == other.getColor()) {
+        if (&boid != &other && boid.getColor() == other.getColor()) { // Sprawdzamy, czy są tej samej grupy
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < ALIGNMENT_RADIUS) {
                 avgVelocity += other.getVelocity();
@@ -206,7 +211,7 @@ glm::vec3 BoidSystem::cohesion(const Boid& boid) const {
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other && boid.getColor() == other.getColor()) {
+        if (&boid != &other && boid.getColor() == other.getColor()) { // Sprawdzamy, czy są tej samej grupy
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < COHESION_RADIUS) {
                 center += other.getPosition();
