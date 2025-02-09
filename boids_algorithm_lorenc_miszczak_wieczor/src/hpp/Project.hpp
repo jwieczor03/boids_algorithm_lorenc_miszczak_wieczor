@@ -311,7 +311,7 @@ void renderScene(GLFWwindow* window) {
     glUseProgram(boidsShader);
     glm::mat4 view = createCameraMatrix();
     glm::mat4 projection = createPerspectiveMatrix();
-    boidSystem->draw(view, projection, boidsShader);
+	boidSystem->draw(view, projection, cameraPos, lightingEnabled, boidsShader);
 
 
 }

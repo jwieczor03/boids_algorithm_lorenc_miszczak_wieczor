@@ -5,19 +5,9 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(1
       zobacz poprzednią definicję „APIENTRY”
   
   Boids.cpp
-  Camera.cpp
-  Render_Utils.cpp
-  Shader_Loader.cpp
-  ShadowMap.cpp
-  Skybox.cpp
   Terrain.cpp
 C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(76,32): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
 C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(78,36): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
 C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\Terrain.cpp(224,40): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-  TextureLoader.cpp
   Generowanie kodu...
-C:\Users\Ksawery\Desktop\GrafikaProjekt\boids_algorithm_lorenc_miszczak_wieczor\src\ShadowMap.cpp(32,1): warning C4715: "InitShadowMap”: niewszystkie ścieżki kodu zwracają wartość
-LINK : warning LNK4098: domyślna biblioteka „LIBCMT” powoduje konflikt z innymi bibliotekami; użyj opcji /NODEFAULTLIB:biblioteka
-LINK : warning LNK4098: domyślna biblioteka „MSVCRT” powoduje konflikt z innymi bibliotekami; użyj opcji /NODEFAULTLIB:biblioteka
-glew32s.lib(glew.obj) : warning LNK4099: nie znaleziono pliku PDB „” z elementem „glew32s.lib(glew.obj)” lub w pozycji „”; obiekt zostanie skonsolidowany bez informacji debugowania
   boids_algorithm_lorenc_miszczak_wieczor.vcxproj -> C:\Users\Ksawery\Desktop\GrafikaProjekt\Debug\boids_algorithm_lorenc_miszczak_wieczor.exe

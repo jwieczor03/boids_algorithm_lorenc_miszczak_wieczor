@@ -151,7 +151,7 @@ namespace Terrain {
         glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &cameraPos[0]);
 
         // Kolor Œwiat³a
-        glm::vec3 lightColor(0.98, 0.9, 0.823);
+        glm::vec3 lightColor(0.98f, 0.9f, 0.823f);
         glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, &lightColor[0]);
 
 

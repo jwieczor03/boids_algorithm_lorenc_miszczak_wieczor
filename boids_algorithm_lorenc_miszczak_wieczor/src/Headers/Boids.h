@@ -13,7 +13,7 @@ public:
     glm::vec3 getPosition() const;
     glm::vec3 getVelocity() const;
     void setVelocity(const glm::vec3& velocity);
-    void draw(const glm::mat4& view, const glm::mat4& projection, GLuint shader) const;
+    void draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const;
     glm::vec3 getColor() const;
 
 private:
@@ -31,7 +31,7 @@ class BoidSystem {
 public:
     BoidSystem(int numBoids, int numGroups);
     void update();
-    void draw(const glm::mat4& view, const glm::mat4& projection, GLuint shader) const;
+    void draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const;
 
 private:
     std::vector<Boid> boids;

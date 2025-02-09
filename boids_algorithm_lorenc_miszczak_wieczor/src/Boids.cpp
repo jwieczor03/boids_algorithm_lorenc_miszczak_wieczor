@@ -62,6 +62,11 @@ void Boid::initializeGeometry() {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
+        // Atrybut normalnych (layout = 1 w shaderze)
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
@@ -86,7 +91,7 @@ void Boid::setVelocity(const glm::vec3& velocity) {
     this->velocity = velocity;
 }
 
-void Boid::draw(const glm::mat4& view, const glm::mat4& projection, GLuint shader) const {
+void Boid::draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
 
@@ -106,6 +111,8 @@ void Boid::draw(const glm::mat4& view, const glm::mat4& projection, GLuint shade
     glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &projection[0][0]);
     glUniform3fv(glGetUniformLocation(shader, "color"), 1, &color[0]);
+    glUniform3fv(glGetUniformLocation(shader, "viewPos"), 1, &cameraPos[0]);
+	glUniform1i(glGetUniformLocation(shader, "lightingEnabled"), lightingEnabled);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 21);  // 21 wierzchołków = pełny model ptaka
@@ -158,9 +165,9 @@ void BoidSystem::update() {
     resolveCollisions();
 }
 
-void BoidSystem::draw(const glm::mat4& view, const glm::mat4& projection, GLuint shader) const {
+void BoidSystem::draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const {
     for (const auto& boid : boids) {
-        boid.draw(view, projection, shader);
+        boid.draw(view, projection, cameraPos, lightingEnabled, shader);
     }
 }
 
