@@ -127,6 +127,7 @@ void BoidSystem::update() {
         boid.updatePosition(boid.getPosition() + newVelocity * 0.1f);
         keepWithinBounds(boid);
     }
+    resolveCollisions();
 }
 
 void BoidSystem::draw(const glm::mat4& view, const glm::mat4& projection, GLuint shader) const {
@@ -135,12 +136,34 @@ void BoidSystem::draw(const glm::mat4& view, const glm::mat4& projection, GLuint
     }
 }
 
+bool BoidSystem::checkCollision(const Boid& a, const Boid& b) const {
+    float size = 0.5f; // Rozmiar AABB
+    glm::vec3 posA = a.getPosition();
+    glm::vec3 posB = b.getPosition();
+
+    return glm::all(glm::lessThan(glm::abs(posA - posB), glm::vec3(size)));
+}
+
+void BoidSystem::resolveCollisions() {
+    for (size_t i = 0; i < boids.size(); ++i) {
+        for (size_t j = i + 1; j < boids.size(); ++j) {
+            if (checkCollision(boids[i], boids[j])) {
+                glm::vec3 velA = boids[i].getVelocity();
+                glm::vec3 velB = boids[j].getVelocity();
+
+                boids[i].setVelocity(-velA);
+                boids[j].setVelocity(-velB);
+            }
+        }
+    }
+}
+
 glm::vec3 BoidSystem::separation(const Boid& boid) const {
     glm::vec3 steering(0.0f);
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other) {
+        if (&boid != &other && boid.getColor() == other.getColor()) {
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < SEPARATION_RADIUS) {
                 glm::vec3 diff = boid.getPosition() - other.getPosition();
@@ -162,7 +185,7 @@ glm::vec3 BoidSystem::alignment(const Boid& boid) const {
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other) {
+        if (&boid != &other && boid.getColor() == other.getColor()) {
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < ALIGNMENT_RADIUS) {
                 avgVelocity += other.getVelocity();
@@ -183,7 +206,7 @@ glm::vec3 BoidSystem::cohesion(const Boid& boid) const {
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other) {
+        if (&boid != &other && boid.getColor() == other.getColor()) {
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < COHESION_RADIUS) {
                 center += other.getPosition();

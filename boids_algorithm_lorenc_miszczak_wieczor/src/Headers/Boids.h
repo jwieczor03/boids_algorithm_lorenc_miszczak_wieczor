@@ -38,7 +38,7 @@ private:
     const float SEPARATION_RADIUS = 1.0f;
     const float ALIGNMENT_RADIUS = 3.0f;
     const float COHESION_RADIUS = 3.0f;
-    const float MAX_SPEED = 0.3f;
+    const float MAX_SPEED = 1.0f;
     const float BOUNDARY = 50.0f;
 
     glm::vec3 separation(const Boid& boid) const;
@@ -46,6 +46,8 @@ private:
     glm::vec3 cohesion(const Boid& boid) const;
     void keepWithinBounds(Boid& boid);
     glm::vec3 limit(glm::vec3 vec, float max) const;
+    bool checkCollision(const Boid& a, const Boid& b) const;
+    void resolveCollisions(); // Added declaration
 };
 
 #endif // BOIDS_H
