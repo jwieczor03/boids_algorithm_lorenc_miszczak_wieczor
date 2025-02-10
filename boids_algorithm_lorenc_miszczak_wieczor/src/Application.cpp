@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 #endif
 
 	// tworzenie okna za pomoca glfw
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Boids ", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1500, 1000, "Boids ", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
 	// ladowanie OpenGL za pomoca glewa
 	glewInit();
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, 1500, 1000);
 
 	init(window);
 

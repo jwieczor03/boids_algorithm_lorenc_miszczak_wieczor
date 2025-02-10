@@ -302,7 +302,7 @@ void BoidSystem::keepWithinBounds(Boid& boid) {
     glm::vec3 vel = boid.getVelocity();
 
     const float margin = 2.0f;
-    const float groundLevel = 10.0f;
+    const float groundLevel = 16.0f;
     const float maxHeight = 40.0f;  
 
     if (pos.x < -BOUNDARY + margin) vel.x = margin * 0.1f;

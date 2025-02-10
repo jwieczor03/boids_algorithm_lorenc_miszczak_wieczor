@@ -316,7 +316,7 @@ void renderShadowMap() {
 
 //Renderowanie sceny z uwzględnieniem cieni
 void renderSceneWithShadows() {
-    glViewport(0, 0, 800, 600); // Ustawienia widoku
+    glViewport(0, 0, 1500, 1000); // Ustawienia widoku
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 view = createCameraMatrix();
