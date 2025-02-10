@@ -16,10 +16,10 @@ public:
     void setVelocity(const glm::vec3& velocity);
     void draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const;
     glm::vec3 getColor() const;
-
-private:
     glm::vec3 position;
     glm::vec3 velocity;
+
+private:
     int group;
     glm::vec3 color;
 
@@ -35,6 +35,7 @@ public:
     void update(GLFWwindow* window);
     void draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const;
     float getMaxSpeed() const;
+    void applyMouseForce(glm::vec3 mousePos, bool attract);
 
 private:
     std::vector<Boid> boids;

@@ -19,6 +19,7 @@ Core::Shader_Loader shaderLoader;
 bool lightingEnabled = true;
 bool shadowEnabled = true;
 bool normalMappingEnabled = true;
+bool attractionMode = true; // true - przyciąganie, false - odpychanie
 
 
 // Parametry kamery
@@ -49,7 +50,7 @@ GLuint qVAO, qVBO;
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 BoidSystem* boidSystem = nullptr;
 GLuint boidsShader;
-
+bool cameraControl = true; // Tryb sterowania kamerą (true = sterowanie kamerą, false = interakcja z boidami)
 
 
 // Ustawienia rzutowania
@@ -104,15 +105,30 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    const float cameraSpeed = 5.0f;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    // Sprawdzenie, czy użytkownik trzyma SHIFT
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        cameraControl = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Pokazujemy kursor
+    }
+    else {
+        cameraControl = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Ukrywamy kursor
+    }
+
+
+    if (cameraControl) { // Tylko jeśli kontrolujemy kamerę
+        const float cameraSpeed = 5.0f;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            cameraPos += cameraSpeed * cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            cameraPos -= cameraSpeed * cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+
+        
     if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
         lightingEnabled = !lightingEnabled;
         std::cout << "Lighting: " << (lightingEnabled ? "ON" : "OFF") << std::endl;
@@ -127,8 +143,22 @@ void processInput(GLFWwindow* window) {
     }
 }
 
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        attractionMode = false; // LPM - odpychanie
+    }
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        attractionMode = true; // PPM - przyciąganie
+    }
+}
+
+
 // Callback obsługi ruchu myszy – aktualizacja kierunku patrzenia kamery
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
+
+    if (!cameraControl) return;// Jeśli nie sterujemy kamerą, nie ruszamy myszą
+
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -163,6 +193,35 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(front);
 }
+
+glm::vec3 getMouseWorldPosition(GLFWwindow* window) {
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+
+    // Przekształcenie współrzędnych ekranu na zakres [-1,1]
+    float x = (2.0f * xpos) / width - 1.0f;
+    float y = 1.0f - (2.0f * ypos) / height; // OpenGL ma odwrotną oś Y
+    float z = 1.0f; // Zakładamy rzutowanie w kierunku obserwacji
+
+    glm::mat4 view = createCameraMatrix();
+    glm::mat4 projection = createPerspectiveMatrix();
+
+    glm::vec4 ray_clip = glm::vec4(x, y, -1.0f, 1.0f);
+    glm::vec4 ray_eye = glm::inverse(projection) * ray_clip;
+    ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
+    glm::vec3 ray_wor = glm::vec3(glm::inverse(view) * ray_eye);
+    ray_wor = glm::normalize(ray_wor);
+
+    // Obliczenie punktu na płaszczyźnie Y=0
+    float t = -cameraPos.y / ray_wor.y;
+    glm::vec3 intersectionPoint = cameraPos + t * ray_wor;
+
+    return intersectionPoint;
+}
+
 
 //Dodatkowa funkjca do debugowania shadow mapy
 //void renderQuad()
@@ -306,6 +365,10 @@ void renderSkybox() {
 void init(GLFWwindow* window) {
 
     glEnable(GL_DEPTH_TEST);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+    glfwSetMouseButtonCallback(window, mouse_button_callback); // Rejestracja obsługi kliknięć myszy
+	glfwSetCursorPosCallback(window, mouse_callback); // Rejestracja obsługi ruchu myszy
     //shadowDebugShader = shaderLoader.CreateProgram("src/Shaders/shadow_debug.vert", "src/Shaders/shadow_debug.frag");
 
     boidSystem = new BoidSystem(300, 3);
@@ -343,6 +406,15 @@ void renderLoop(GLFWwindow* window) {
     while (!glfwWindowShouldClose(window)) {
         //printf("Camerapos: %f, %f, %f, CameraDir: %f, %f, %f\n", cameraPos.x, cameraPos.y, cameraPos.z, cameraFront.x, cameraFront.y, cameraFront.z);
         processInput(window);
+
+        // Interakcja z boidami tylko gdy kamera NIE jest sterowana
+        if (!cameraControl && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS ||
+            glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)) {
+            glm::vec3 mouseWorldPos = getMouseWorldPosition(window);
+            boidSystem->applyMouseForce(mouseWorldPos, attractionMode);
+        }
+
+
         renderScene(window);
         printf("Max Speed: %f\n", boidSystem->getMaxSpeed());
         glfwPollEvents();

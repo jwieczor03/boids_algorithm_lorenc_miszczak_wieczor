@@ -335,7 +335,17 @@ void BoidSystem::keepWithinBounds(Boid& boid) {
     boid.updatePosition(pos);
 }
 
-
+void BoidSystem::applyMouseForce(glm::vec3 mousePos, bool attract) {
+    for (auto& boid : boids) {
+        glm::vec3 direction = mousePos - boid.position;
+        float distance = glm::length(direction);
+        if (distance < 100.0f) { // Ustaw obszar działania
+            float strength = 5.0f / (distance + 1.0f); // Im bliżej, tym silniejsza siła
+            if (!attract) strength *= -1; // Odpychanie zamiast przyciągania
+            boid.velocity += glm::normalize(direction) * strength;
+        }
+    }
+}
 
 glm::vec3 BoidSystem::limit(glm::vec3 vec, float max) const {
     float length = glm::length(vec);
