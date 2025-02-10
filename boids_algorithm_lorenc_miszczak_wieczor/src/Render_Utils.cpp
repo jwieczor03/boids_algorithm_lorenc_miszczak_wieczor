@@ -9,7 +9,6 @@
 #include <assimp/postprocess.h>
 
 
-
 void Core::RenderContext::initFromAssimpMesh(aiMesh* mesh) {
     vertexArray = 0;
     vertexBuffer = 0;
@@ -38,9 +37,6 @@ void Core::RenderContext::initFromAssimpMesh(aiMesh* mesh) {
         for (unsigned int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
-
-
-
 
 }
 

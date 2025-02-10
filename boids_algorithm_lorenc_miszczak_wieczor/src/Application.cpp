@@ -9,7 +9,6 @@
 #include "hpp/Project.hpp"
 
 
-
 int main(int argc, char** argv)
 {
 	// inicjalizacja glfw
@@ -32,7 +31,7 @@ int main(int argc, char** argv)
 	}
 	glfwMakeContextCurrent(window);
 
-	//ruszanie kamer¹
+	//ruszanie kamery
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 

@@ -44,7 +44,6 @@ GLuint loadTexture(const char* path) {
 
     unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
 
-
     if (data) {
         GLenum format;
         if (nrChannels == 1)

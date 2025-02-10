@@ -13,7 +13,6 @@ namespace Terrain {
     bool lightingEnabled = true;
 
 
-
     void initTerrain() {
         // Tworzenie mesh na podstawie heightmapy
         stbi_set_flip_vertically_on_load(true);

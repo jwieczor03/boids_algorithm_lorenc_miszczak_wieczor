@@ -14,6 +14,8 @@
 #include "Headers/Boids.h" 
 #include <cstdlib> 
 #include <ctime> 
+
+
 namespace fs = std::filesystem;
 Core::Shader_Loader shaderLoader;
 bool lightingEnabled = true;
@@ -23,9 +25,9 @@ bool attractionMode = true; // true - przyciąganie, false - odpychanie
 
 
 // Parametry kamery
-glm::vec3 cameraPos = glm::vec3(8.2f, 9.8f, -10.0f);  //Pozycja kamery
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f); //Wektor patrzenia kamery
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //Wektor góry kamery
+glm::vec3 cameraPos = glm::vec3(8.2f, 9.8f, -10.0f);   //Pozycja kamery
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);  //Wektor patrzenia kamery
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);      //Wektor góry kamery
 
 // Pozycja światła
 glm::vec3 lightPos = glm::vec3(8.2f, 50.0f, -10.0f);
@@ -46,12 +48,13 @@ GLuint skyboxShader;
 GLuint shadowFBO, shadowMap;
 GLuint shadowShader;
 GLuint qVAO, qVBO;
-//GLuint shadowDebugShader; //Do debugowania shadow mapy
+
+//Do debugowania shadow mapy
+//GLuint shadowDebugShader; 
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 BoidSystem* boidSystem = nullptr;
 GLuint boidsShader;
 bool cameraControl = true; // Tryb sterowania kamerą (true = sterowanie kamerą, false = interakcja z boidami)
-
 
 // Ustawienia rzutowania
 float aspectRatio = 1.f;
@@ -170,7 +173,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     }
 
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // Odwrócone, gdy¿ wspó³rzêdne y rosn¹ od do³u do góry
+    float yoffset = lastY - ypos; // Odwrócone, gdy współrzędne y rosną od dołu do góry
     lastX = xpos;
     lastY = ypos;
 
@@ -181,7 +184,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     yaw += xoffset;
     pitch += yoffset;
 
-    // Ograniczenie k¹ta pitch, by zapobiec "przewróceniu" kamery
+    // Ograniczenie by zapobiec "przewróceniu" kamery
     if (pitch > 89.0f)
         pitch = 89.0f;
     if (pitch < -89.0f)
@@ -353,6 +356,7 @@ void renderSceneWithShadows() {
     boidSystem->draw(view, projection, cameraPos, lightingEnabled, boidsShader);
 
 }
+
 // Renderowanie skyboxa
 void renderSkybox() {
     glDepthFunc(GL_LEQUAL);
@@ -413,7 +417,6 @@ void renderLoop(GLFWwindow* window) {
             glm::vec3 mouseWorldPos = getMouseWorldPosition(window);
             boidSystem->applyMouseForce(mouseWorldPos, attractionMode);
         }
-
 
         renderScene(window);
         printf("Max Speed: %f\n", boidSystem->getMaxSpeed());

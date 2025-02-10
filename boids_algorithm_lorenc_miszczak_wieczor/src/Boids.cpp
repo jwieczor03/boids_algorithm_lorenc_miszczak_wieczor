@@ -6,7 +6,6 @@
 #include <ctime>
 #include <unordered_map>
 
-
 GLuint Boid::VAO = 0;
 GLuint Boid::VBO = 0;
 
@@ -114,7 +113,6 @@ void Boid::draw(const glm::mat4& view, const glm::mat4& projection, const glm::v
     glDrawArrays(GL_TRIANGLES, 0, 21);  
     glBindVertexArray(0);
 }
-
 
 
 BoidSystem::BoidSystem(int numBoids, int numGroups) {
