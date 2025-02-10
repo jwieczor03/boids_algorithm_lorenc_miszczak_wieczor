@@ -52,7 +52,7 @@ namespace Terrain {
 
         std::vector<float> normals(vertices.size(), 0.0f); // Wektor normalnych
 
-        // Iteracja po kaødym wierzcho≥ku i obliczanie normalnych
+        // Iteracja po ka≈ºdym wierzcho≈Çku i obliczanie normalnych
         for (int i = 1; i < height - 1; i++) {
             for (int j = 1; j < width - 1; j++) {
                 int index = (j + width * i);
@@ -81,7 +81,54 @@ namespace Terrain {
                 }
             }
         }
+
+
         std::cout << "Loaded " << indices.size() << " indices" << std::endl;
+
+        std::vector<float> tangents(vertices.size(), 0.0f);
+        std::vector<float> bitangents(vertices.size(), 0.0f);
+
+        for (int i = 1; i < height - 1; i++) {
+            for (int j = 1; j < width - 1; j++) {
+                int index = (j + width * i);
+
+                glm::vec3 pos1(vertices[(index) * 3], vertices[(index) * 3 + 1], vertices[(index) * 3 + 2]);
+                glm::vec3 pos2(vertices[(index + 1) * 3], vertices[(index + 1) * 3 + 1], vertices[(index + 1) * 3 + 2]);
+                glm::vec3 pos3(vertices[(index + width) * 3], vertices[(index + width) * 3 + 1], vertices[(index + width) * 3 + 2]);
+
+                glm::vec2 uv1(j / (float)width, i / (float)height);
+                glm::vec2 uv2((j + 1) / (float)width, i / (float)height);
+                glm::vec2 uv3(j / (float)width, (i + 1) / (float)height);
+
+                glm::vec3 edge1 = pos2 - pos1;
+                glm::vec3 edge2 = pos3 - pos1;
+                glm::vec2 deltaUV1 = uv2 - uv1;
+                glm::vec2 deltaUV2 = uv3 - uv1;
+
+                float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                glm::vec3 tangent, bitangent;
+                tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                tangent = glm::normalize(tangent);
+
+                bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                bitangent = glm::normalize(bitangent);
+
+                tangents[index * 3] = tangent.x;
+                tangents[index * 3 + 1] = tangent.y;
+                tangents[index * 3 + 2] = tangent.z;
+
+                bitangents[index * 3] = bitangent.x;
+                bitangents[index * 3 + 1] = bitangent.y;
+                bitangents[index * 3 + 2] = bitangent.z;
+            }
+        }
+
+
 
         numStrips = (height - 1) / rez;
         numTrisPerStrip = (width / rez) * 2 - 2;
@@ -94,11 +141,19 @@ namespace Terrain {
 
         glGenBuffers(1, &terrainVBO);
         glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + normals.size() * sizeof(float), nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER,
+            vertices.size() * sizeof(float) +
+            normals.size() * sizeof(float) +
+            tangents.size() * sizeof(float) +
+            bitangents.size() * sizeof(float),
+            nullptr, GL_STATIC_DRAW);
+
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
         glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), normals.size() * sizeof(float), &normals[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + normals.size() * sizeof(float), tangents.size() * sizeof(float), &tangents[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float) + normals.size() * sizeof(float) + tangents.size() * sizeof(float), bitangents.size() * sizeof(float), &bitangents[0]);
 
-        // Atrybuty wierzcho≥kÛw
+        // Atrybuty wierzcho≈Çk√≥w
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
@@ -106,17 +161,30 @@ namespace Terrain {
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(vertices.size() * sizeof(float)));
         glEnableVertexAttribArray(1);
 
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(vertices.size() * sizeof(float) + normals.size() * sizeof(float)));
+        glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(vertices.size() * sizeof(float) + normals.size() * sizeof(float) + tangents.size() * sizeof(float)));
+        glEnableVertexAttribArray(3);
+
 
         glGenBuffers(1, &terrainIBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainIBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned), &indices[0], GL_STATIC_DRAW);
 
-        // £adowanie tekstur
+        // ≈Åadowanie tekstur
+        grassNormal = loadTexture("src/Textures/Terrain/Grass/Grass001_1K-PNG_NormalGL.png");
+
+        rockNormal = loadTexture("src/Textures/Terrain/Rock/Rock020_1K-PNG_NormalGL.png");
+
+        snowNormal = loadTexture("src/Textures/Terrain/Snow/Snow008A_1K-PNG_NormalGL.png");
+
         grassColor = loadTexture("src/Textures/Terrain/Grass/Grass001_1K-PNG_Color.png");
 
         rockColor = loadTexture("src/Textures/Terrain/Rock/Rock020_1K-PNG_Color.png");
 
         snowColor = loadTexture("src/Textures/Terrain/Snow/Snow008A_1K-PNG_Color.png");
+
     }
 
     void drawTerrain(GLuint program, const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& color, const glm::vec3& cameraPos, bool lightingEnabled) {
@@ -138,18 +206,33 @@ namespace Terrain {
 
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, grassColor);
-        glUniform1i(glGetUniformLocation(program, "grassColor"), 0);
+        glBindTexture(GL_TEXTURE_2D, grassNormal);
+        glUniform1i(glGetUniformLocation(program, "grassNormalMap"), 0);
 
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, rockColor);
-        glUniform1i(glGetUniformLocation(program, "rockColor"), 1);
+        glBindTexture(GL_TEXTURE_2D, rockNormal);
+        glUniform1i(glGetUniformLocation(program, "rockNormalMap"), 1);
 
 
         glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, snowNormal);
+        glUniform1i(glGetUniformLocation(program, "snowNormalMap"), 2);
+
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, grassColor);
+        glUniform1i(glGetUniformLocation(program, "grassColorMap"), 3);
+
+
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, rockColor);
+        glUniform1i(glGetUniformLocation(program, "rockColorMap"), 4);
+
+
+        glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, snowColor);
-        glUniform1i(glGetUniformLocation(program, "snowColor"), 2);
+        glUniform1i(glGetUniformLocation(program, "snowColorMap"), 5);
 
 
 
