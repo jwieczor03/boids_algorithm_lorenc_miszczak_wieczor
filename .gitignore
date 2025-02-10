@@ -2,3 +2,5 @@
 .vs
 .ide
 /Dependencies
+/x64
+/Debug
