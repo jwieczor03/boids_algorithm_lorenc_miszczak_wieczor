@@ -18,6 +18,7 @@ namespace fs = std::filesystem;
 Core::Shader_Loader shaderLoader;
 bool lightingEnabled = true;
 bool shadowEnabled = true;
+bool normalMappingEnabled = true;
 
 
 // Parametry kamery
@@ -98,7 +99,6 @@ std::tuple<glm::mat4, glm::mat4, glm::mat4> createLightSpaceMatrix() {
 }
 
 
-
 // Obsługa Wejścia
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -120,6 +120,10 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
         shadowEnabled = !shadowEnabled;
         std::cout << "Shadow: " << (shadowEnabled ? "ON" : "OFF") << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) { // Toggle normal mapping
+        normalMappingEnabled = !normalMappingEnabled;
+        std::cout << "Normal Mapping: " << (normalMappingEnabled ? "ON" : "OFF") << std::endl;
     }
 }
 
@@ -274,6 +278,7 @@ void renderSceneWithShadows() {
     glBindTexture(GL_TEXTURE_2D, shadowMap);
     glUniform1i(glGetUniformLocation(program, "shadowMap"), 15);
     glUniform1i(glGetUniformLocation(program, "shadowEnabled"), shadowEnabled);
+    glUniform1i(glGetUniformLocation(program, "normalMappingEnabled"), normalMappingEnabled);
 
     // Rysowanie terenu z uwzględnieniem cieni
     Terrain::drawTerrain(program, view, projection, glm::vec3(0.75f), cameraPos, lightingEnabled);
@@ -319,6 +324,10 @@ void init(GLFWwindow* window) {
 void renderScene(GLFWwindow* window) {
     boidSystem->update(window);       //Aktualizacja boidów
     renderShadowMap();          //Renderowanie shadow map  
+
+    glUseProgram(program);
+    glUniform1i(glGetUniformLocation(program, "normalMappingEnabled"), normalMappingEnabled);
+
     //renderShadowMapDebug();   //Do visual debugowania shadow mapy
     renderSceneWithShadows();    //Renderowanie sceny z cieniami
     renderSkybox();              //Renderowanie skyboxa
