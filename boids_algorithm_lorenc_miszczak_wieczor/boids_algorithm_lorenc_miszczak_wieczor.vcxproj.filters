@@ -89,6 +89,8 @@
     <None Include="src\Shaders\shadow.frag" />
     <None Include="src\Shaders\boids.frag" />
     <None Include="src\Shaders\boids.vert" />
+    <None Include="src\Shaders\shadow_debug.frag" />
+    <None Include="src\Shaders\shadow_debug.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\Textures\Skybox\bottom.jpg">

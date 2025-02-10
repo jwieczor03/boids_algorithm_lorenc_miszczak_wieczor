@@ -31,13 +31,3 @@ bool InitShadowMap(GLuint& FBO, GLuint& shadowMap, unsigned int width, unsigned 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);;
 }
 
-void BindShadowMapForWriting(GLuint FBO, unsigned int width, unsigned int height) {
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glViewport(0, 0, width, height);
-    glClear(GL_DEPTH_BUFFER_BIT);
-}
-
-void BindShadowMapForReading(GLuint shadowMap, GLenum textureUnit) {
-    glActiveTexture(textureUnit);
-    glBindTexture(GL_TEXTURE_2D, shadowMap);
-}

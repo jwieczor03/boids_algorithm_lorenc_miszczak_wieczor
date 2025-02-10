@@ -112,13 +112,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GL\include;$(SolutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GL\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\FREEGLUT\include;$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\STB</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GL\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2022</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glfw3.lib;glew32.lib;glew32mx.lib;glew32mxs.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GL\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\FREEGLUT\lib;$(SolutionDir)Dependencies\ASSIMP\lib\Debug;$(SolutionDir)Dependencies\STB</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glfw3.lib;freeglut.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,6 +168,8 @@
     <None Include="src\Shaders\shadow.vert" />
     <None Include="src\Shaders\shader.frag" />
     <None Include="src\Shaders\shader.vert" />
+    <None Include="src\Shaders\shadow_debug.frag" />
+    <None Include="src\Shaders\shadow_debug.vert" />
     <None Include="src\Shaders\skybox.frag" />
     <None Include="src\Shaders\skybox.vert" />
     <None Include="src\Textures\Terrain\PavningStone\PavingStones138_1K-PNG.mtlx" />

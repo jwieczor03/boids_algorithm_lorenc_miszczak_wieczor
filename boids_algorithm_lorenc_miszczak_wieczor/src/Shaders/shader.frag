@@ -8,7 +8,6 @@ in vec4 FragPosLightSpace;
 
 uniform sampler2D shadowMap;
 
-uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform vec3 lightColor;
 uniform bool lightingEnabled;
@@ -17,6 +16,9 @@ uniform bool shadowEnabled;
 uniform sampler2D grassColor;
 uniform sampler2D rockColor;
 uniform sampler2D snowColor;
+
+const vec3 lightPos = vec3(8.2, 200.0, -10.0);
+
 
 float ShadowCalculation(vec4 fragPosLightSpace) {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -39,7 +41,6 @@ float ShadowCalculation(vec4 fragPosLightSpace) {
     }
     shadow /= 9.0;
     
-    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
     if(projCoords.z > 1.0)
         shadow = 0.0;
         
@@ -86,14 +87,16 @@ void main()
 
     float shadow = ShadowCalculation(FragPosLightSpace);
 
+
     if (!shadowEnabled) {
-        shadow = 1.0;
+        shadow = 0.0;
     }
 
     vec3 ambient = 0.2 * lightColor * finalColor.rgb;
     vec3 diffuse = diff * lightColor * finalColor.rgb;
     vec3 specular = spec * lightColor;
 
+
     vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular)) * lightColor; 
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, 1.0); 
 }
