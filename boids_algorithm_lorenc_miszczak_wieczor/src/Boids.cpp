@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 
-// Statyczne zmienne klasy Boid
 GLuint Boid::VAO = 0;
 GLuint Boid::VBO = 0;
 
@@ -48,7 +47,7 @@ const float Boid::BOID_VERTICES[] = {
      1.0f,  0.0f, -0.5f,  
      0.0f, -0.5f, -0.5f  
 };
-
+// Initialize the geometry for the Boid class
 void Boid::initializeGeometry() {
     if (VAO == 0) {
         glGenVertexArrays(1, &VAO);
@@ -58,11 +57,9 @@ void Boid::initializeGeometry() {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(BOID_VERTICES), BOID_VERTICES, GL_STATIC_DRAW);
 
-        // Atrybut pozycji (layout = 0 w shaderze)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
-        // Atrybut normalnych (layout = 1 w shaderze)
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
@@ -73,7 +70,7 @@ void Boid::initializeGeometry() {
 }
 
 
-
+// Constructor for the Boid class
 Boid::Boid(glm::vec3 position, glm::vec3 velocity, int group, glm::vec3 color)
     : position(position), velocity(velocity), group(group), color(color) {
     initializeGeometry();
@@ -90,7 +87,7 @@ glm::vec3 Boid::getColor() const { return color; }
 void Boid::setVelocity(const glm::vec3& velocity) {
     this->velocity = velocity;
 }
-
+// Draw the boid using the provided view, projection, and camera position
 void Boid::draw(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos, bool lightingEnabled, GLuint shader) const {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
@@ -98,12 +95,11 @@ void Boid::draw(const glm::mat4& view, const glm::mat4& projection, const glm::v
     if (glm::length(velocity) > 0.001f) {
         glm::vec3 dir = glm::normalize(velocity);
 
-        // Kierunek lotu -> Euler angles
         float yaw = atan2(dir.x, dir.z);
         float pitch = -asin(dir.y);
 
-        model = glm::rotate(model, yaw, glm::vec3(0.0f, 1.0f, 0.0f));   // Obrót w poziomie
-        model = glm::rotate(model, pitch, glm::vec3(1.0f, 0.0f, 0.0f)); // Obrót w pionie
+        model = glm::rotate(model, yaw, glm::vec3(0.0f, 1.0f, 0.0f));   
+        model = glm::rotate(model, pitch, glm::vec3(1.0f, 0.0f, 0.0f)); 
     }
 
     glUseProgram(shader);
@@ -115,7 +111,7 @@ void Boid::draw(const glm::mat4& view, const glm::mat4& projection, const glm::v
 	glUniform1i(glGetUniformLocation(shader, "lightingEnabled"), lightingEnabled);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 21);  // 21 wierzchołków = pełny model ptaka
+    glDrawArrays(GL_TRIANGLES, 0, 21);  
     glBindVertexArray(0);
 }
 
@@ -149,13 +145,13 @@ BoidSystem::BoidSystem(int numBoids, int numGroups) {
 }
 
 void BoidSystem::handleInput(GLFWwindow* window) {
-    float speedChange = 0.1f; // Adjust this value to change the speed increment
+    float speedChange = 0.1f;
 
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        MAX_SPEED += speedChange; // Zwiększanie MAX_SPEED
+        MAX_SPEED += speedChange; 
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        MAX_SPEED = std::max(0.0f, MAX_SPEED - speedChange); // Zmniejszanie MAX_SPEED, ale nie poniżej 0
+        MAX_SPEED = std::max(0.0f, MAX_SPEED - speedChange);
     }
 }
 
@@ -188,26 +184,26 @@ void BoidSystem::draw(const glm::mat4& view, const glm::mat4& projection, const 
     }
 }
 
+// AABB algorithm
 bool BoidSystem::checkCollision(const Boid& a, const Boid& b) const {
-    if (a.getColor() != b.getColor()) return false; // Only boids of the same group repel each other
+    if (a.getColor() != b.getColor()) return false; 
 
-    float size = 0.5f; // Variable dependent on boid size
+    float size = 0.5f;
     glm::vec3 posA = a.getPosition();
     glm::vec3 posB = b.getPosition();
 
-    // Collision detection based on distance
     return glm::distance(posA, posB) < size;
 }
-
+// AABB algorithm
 void BoidSystem::resolveCollisions() {
-    const float cellSize = 1.0f; // Adjust based on boid size and density
+    const float cellSize = 1.0f; 
     std::unordered_map<int, std::vector<Boid*>> grid;
 
     auto getCellIndex = [cellSize](const glm::vec3& pos) {
         int x = static_cast<int>(pos.x / cellSize);
         int y = static_cast<int>(pos.y / cellSize);
         int z = static_cast<int>(pos.z / cellSize);
-        return (x * 73856093) ^ (y * 19349663) ^ (z * 83492791); // Hash function for 3D grid
+        return (x * 73856093) ^ (y * 19349663) ^ (z * 83492791); 
         };
 
     for (auto& boid : boids) {
@@ -233,13 +229,13 @@ void BoidSystem::resolveCollisions() {
 }
 
 
-
+// implementations rules of boids algorithm
 glm::vec3 BoidSystem::separation(const Boid& boid) const {
     glm::vec3 steering(0.0f);
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other && boid.getColor() == other.getColor()) { // Check if they are in the same group
+        if (&boid != &other && boid.getColor() == other.getColor()) { 
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < SEPARATION_RADIUS) {
                 glm::vec3 diff = boid.getPosition() - other.getPosition();
@@ -256,13 +252,13 @@ glm::vec3 BoidSystem::separation(const Boid& boid) const {
     return steering;
 }
 
-
+// implementations rules of boids algorithm
 glm::vec3 BoidSystem::alignment(const Boid& boid) const {
     glm::vec3 avgVelocity(0.0f);
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other && boid.getColor() == other.getColor()) { // Sprawdzamy, czy są tej samej grupy
+        if (&boid != &other && boid.getColor() == other.getColor()) { 
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < ALIGNMENT_RADIUS) {
                 avgVelocity += other.getVelocity();
@@ -277,13 +273,13 @@ glm::vec3 BoidSystem::alignment(const Boid& boid) const {
     }
     return avgVelocity;
 }
-
+// implementations rules of boids algorithm
 glm::vec3 BoidSystem::cohesion(const Boid& boid) const {
     glm::vec3 center(0.0f);
     int count = 0;
 
     for (const auto& other : boids) {
-        if (&boid != &other && boid.getColor() == other.getColor()) { // Sprawdzamy, czy są tej samej grupy
+        if (&boid != &other && boid.getColor() == other.getColor()) {
             float distance = glm::distance(boid.getPosition(), other.getPosition());
             if (distance < COHESION_RADIUS) {
                 center += other.getPosition();
@@ -300,34 +296,30 @@ glm::vec3 BoidSystem::cohesion(const Boid& boid) const {
     }
     return glm::vec3(0.0f);
 }
-
+//limitation of boids movement space
 void BoidSystem::keepWithinBounds(Boid& boid) {
     glm::vec3 pos = boid.getPosition();
     glm::vec3 vel = boid.getVelocity();
 
     const float margin = 2.0f;
-    const float groundLevel = 10.0f;  // Minimalna wysokość (poziom ziemi)
-    const float maxHeight = 40.0f;   // Maksymalna wysokość lotu
+    const float groundLevel = 10.0f;
+    const float maxHeight = 40.0f;  
 
-    // Ograniczenie dla osi X i Z (obecne)
     if (pos.x < -BOUNDARY + margin) vel.x = margin * 0.1f;
     if (pos.x > BOUNDARY - margin) vel.x = -margin * 0.1f;
     if (pos.z < -BOUNDARY + margin) vel.z = margin * 0.1f;
     if (pos.z > BOUNDARY - margin) vel.z = -margin * 0.1f;
 
-    // Ograniczenie dla osi Y (zapobiega wlatywaniu w ziemię)
     if (pos.y < groundLevel) {
-        pos.y = groundLevel;  // Jeśli boid jest poniżej ziemi, ustaw jego pozycję na poziomie ziemi
-        vel.y = fabs(vel.y) * 0.5f; // Odbicie w górę z osłabieniem
+        pos.y = groundLevel;
+        vel.y = fabs(vel.y) * 0.5f;
     }
 
-    // Ograniczenie dla maksymalnej wysokości
     if (pos.y > maxHeight) {
-        pos.y = maxHeight;  // Jeśli boid przekroczy maxHeight, ustaw jego pozycję na granicy
-        vel.y = -fabs(vel.y) * 0.5f; // Odbicie w dół z osłabieniem
+        pos.y = maxHeight;  
+        vel.y = -fabs(vel.y) * 0.5f;
     }
 
-    // Ostateczne ograniczenie pozycji X, Z
     pos.x = glm::clamp(pos.x, -BOUNDARY, BOUNDARY);
     pos.z = glm::clamp(pos.z, -BOUNDARY, BOUNDARY);
 
@@ -339,9 +331,9 @@ void BoidSystem::applyMouseForce(glm::vec3 mousePos, bool attract) {
     for (auto& boid : boids) {
         glm::vec3 direction = mousePos - boid.position;
         float distance = glm::length(direction);
-        if (distance < 100.0f) { // Ustaw obszar działania
-            float strength = 5.0f / (distance + 1.0f); // Im bliżej, tym silniejsza siła
-            if (!attract) strength *= -1; // Odpychanie zamiast przyciągania
+        if (distance < 100.0f) { 
+            float strength = 5.0f / (distance + 1.0f); 
+            if (!attract) strength *= -1;
             boid.velocity += glm::normalize(direction) * strength;
         }
     }

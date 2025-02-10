@@ -51,7 +51,7 @@ private:
     void keepWithinBounds(Boid& boid);
     glm::vec3 limit(glm::vec3 vec, float max) const;
     bool checkCollision(const Boid& a, const Boid& b) const;
-    void resolveCollisions(); // Added declaration
+    void resolveCollisions(); 
 };
 
 #endif // BOIDS_H
